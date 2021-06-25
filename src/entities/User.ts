@@ -7,12 +7,15 @@ import {
   BeforeInsert,
   BeforeUpdate,
   AfterLoad,
+  OneToMany,
 } from "typeorm";
 import { v4 as uuid } from "uuid";
 import bcrypt from "bcryptjs";
-
+import { Compliment } from "./Compliment";
+import { Exclude } from "class-transformer";
 @Entity("users")
 class User {
+  @Exclude()
   private tempPassword: string;
   @AfterLoad()
   private loadTempPassword(): void {
@@ -31,8 +34,15 @@ class User {
   @Column()
   admin: boolean;
 
+  @Exclude()
   @Column()
   password: string;
+
+  @OneToMany(() => Compliment, (compliment) => compliment.userReceiver)
+  complimentReceiver: Compliment[];
+
+  @OneToMany(() => Compliment, (compliment) => compliment.userSender)
+  complimentSender: Compliment[];
 
   @CreateDateColumn()
   created_at: Date;
