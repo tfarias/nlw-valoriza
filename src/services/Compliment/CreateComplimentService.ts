@@ -1,7 +1,7 @@
 import { getCustomRepository } from "typeorm";
-import { ErrorException } from "../../exceptions/ErrorException";
 import { ComplimentRepository } from "../../repositories/ComplimentRepository";
 import { UserRepository } from "../../repositories/UserRepository";
+import SendComplimentService from "./SendComplimentService";
 interface IComplimentRequest {
   tag_id: string;
   user_sender: string;
@@ -23,7 +23,6 @@ class CreateComplimentService {
       throw new Error("Incorrect User Receiver");
     }
 
-    console.log(user_receiver);
     const userReceiverExists = await userRepository.findOne(user_receiver);
 
     if (!userReceiverExists) {
@@ -38,6 +37,8 @@ class CreateComplimentService {
     });
 
     await complimentRepository.save(compliment);
+
+    SendComplimentService.sendEmail(compliment.id);
     return compliment;
   }
 }
